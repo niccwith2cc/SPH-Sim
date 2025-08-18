@@ -1,4 +1,5 @@
 #include <Particle.h>
+#include <Vec3.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
@@ -8,7 +9,7 @@
 int main() {
 
   if (!glfwInit()) return -1;
-  GLFWwindow* window = glfwCreateWindow(800, 600, "Simulation", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(1920, 1200, "Windowed View", NULL, NULL);
   if (!window){
     glfwTerminate();
     return -1;
@@ -23,10 +24,10 @@ int main() {
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init("#version 130");
 
-  vec3 position = {.0f, .0f, .0f};
-  vec3 velocity = {.0f, .0f, .0f};
+  Vec3 position = {.0f, .0f, .0f};
+  Vec3 velocity = {.0f, .0f, .0f};
 
-  Particle p(position, velocity);
+  Particle p;
 
   while (!glfwWindowShouldClose(window)) {
     glfwPollEvents();
@@ -36,15 +37,15 @@ int main() {
     ImGui::NewFrame();
 
     ImGui::Begin("Particle Info:");
-    ImGui::Text("Position: (%.2f, %.2f, %.2f)", p.getPosition().x, p.getPosition().y, p.getPosition().z);
-    ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", p.getVelocity().x, p.getVelocity().y, p.getVelocity().z);
+    ImGui::Text("Position: (%.2f, %.2f, %.2f)", p.getPosition().getX(), p.getPosition().getY(), p.getPosition().getZ());
+    ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", p.getVelocity().getX(), p.getVelocity().getY(), p.getVelocity().getZ());
     ImGui::Text("Mass: %.2f", p.getMass());
     ImGui::Text("Pressure: %.2f", p.getPressure());
     ImGui::End();
 
     // Main simulation window
-    ImGui::SetNextWindowSize(ImVec2(600, 600), ImGuiCond_FirstUseEver);
-    ImGui::Begin("Simulation");
+    ImGui::SetNextWindowSize(ImVec2(1680, 1050), ImGuiCond_FirstUseEver);
+    ImGui::Begin("Yes");
 
     // Get draw list and window geometry
     ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -57,7 +58,7 @@ int main() {
     int grid_lines = 10;        // number of lines in each direction from center
 
     // Center of the simulation area in window coordinates
-    ImVec2 sim_center = ImVec2(win_pos.x + win_size.x * 0.5f, win_pos.y + win_size.y * 0.6f);
+    ImVec2 sim_center = ImVec2(win_pos.x + win_size.x * 0.5f, win_pos.y + win_size.y * 0.5f);
 
     // Draw grid lines
     for (int i = -grid_lines; i <= grid_lines; ++i) {
@@ -80,18 +81,26 @@ int main() {
     // Draw axis lines
     draw_list->AddLine(ImVec2(sim_center.x, sim_center.y - grid_lines * grid_spacing),
                        ImVec2(sim_center.x, sim_center.y + grid_lines * grid_spacing),
-                       IM_COL32(255, 0, 0, 255), 2.0f);
+                       IM_COL32(150, 150, 150, 255), 2.0f);
     draw_list->AddLine(ImVec2(sim_center.x - grid_lines * grid_spacing, sim_center.y),
                        ImVec2(sim_center.x + grid_lines * grid_spacing, sim_center.y),
-                       IM_COL32(0, 255, 0, 255), 2.0f);
+                       IM_COL32(150, 150, 150, 255), 2.0f);
 
     // --- Draw the particle ---
     // Map particle's (x, y) to screen coordinates
-    float px = sim_center.x + p.getPosition().x * grid_spacing;
-    float py = sim_center.y - p.getPosition().y * grid_spacing; // y axis up
+    float px = sim_center.x + p.getPosition().getX() * grid_spacing;
+    float py = sim_center.y - p.getPosition().getY() * grid_spacing; // y axis up
+    std::cout << "Positional vector: " << p.getPosition() << std::endl;
 
     float radius = 20.0f * p.getMass();
     draw_list->AddCircleFilled(ImVec2(px, py), radius, IM_COL32(100, 200, 255, 255));
+
+    // p.setPosition += Vec3(1.0f, 0.0f, 0.0f);
+    Vec3 pos = p.getPosition();
+    pos += Vec3(0.01f, 0.0f, 0.0f);
+    p.setPosition(pos);
+    std::cout << "Positional vector2: " << p.getPosition() << std::endl;
+
 
     ImGui::End();
 
