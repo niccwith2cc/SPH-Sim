@@ -1,5 +1,6 @@
 #include <Particle.h>
 #include <Vec3.h>
+#include <Simulate.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <GLFW/glfw3.h>
@@ -95,13 +96,8 @@ int main() {
     float radius = 20.0f * p.getMass();
     draw_list->AddCircleFilled(ImVec2(px, py), radius, IM_COL32(100, 200, 255, 255));
 
-    // p.setPosition += Vec3(1.0f, 0.0f, 0.0f);
-    Vec3 pos = p.getPosition();
-    pos += Vec3(0.01f, 0.0f, 0.0f);
-    p.setPosition(pos);
+    simulate(p);
     std::cout << "Positional vector2: " << p.getPosition() << std::endl;
-
-
     ImGui::End();
 
     // Render
