@@ -18,15 +18,23 @@ public:
 
   void set(float _x, float _y, float _z);
 
+  // Vec on Vec
   Vec3 operator+(const Vec3& other) const;
   Vec3 operator-(const Vec3& other) const;
   Vec3 operator*(const Vec3& other) const;
   Vec3 operator/(const Vec3& other) const;
 
+  // Vec on self
   Vec3& operator+=(const Vec3& other);
   Vec3& operator-=(const Vec3& other);
   Vec3& operator*=(const Vec3& other);
   Vec3& operator/=(const Vec3& other);
+
+  // Vec on scalar
+  Vec3 operator+(const float other) const;
+  Vec3 operator-(const float other) const;
+  Vec3 operator*(const float other) const;
+  Vec3 operator/(const float other) const;
 
   void Print() const;
   friend std::ostream& operator<<(std::ostream& os, const Vec3& v);

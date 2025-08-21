@@ -83,9 +83,6 @@ void draw_Grid_Particles(std::vector<Particle> &particleList){
   draw_list->AddLine(ImVec2(sim_center.x - grid_lines * grid_spacing, sim_center.y),
                       ImVec2(sim_center.x + grid_lines * grid_spacing, sim_center.y),
                       IM_COL32(150, 150, 150, 255), 2.0f);
-                      
-  float grid_spacing = 40.0f; // pixels between grid lines
-  int grid_lines = 10;        // number of lines in each direction from center
 
   // --- Draw the particle ---
   // Map particle's (x, y) to screen coordinates

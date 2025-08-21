@@ -15,7 +15,7 @@ int main() {
   // initial conditions
   std::vector<Particle> particleList;
   int nb = 4;
-  int finalTime = 10;
+  float finalTime = 0.09f;
 
   spawnGrid(particleList, nb);
 
@@ -24,13 +24,12 @@ int main() {
   int fail = startWin(window);
   if (fail == -1) return -1;
 
+  // simulate
+  simulate(particleList, finalTime);
 
   while (!glfwWindowShouldClose(window)) {
     // Draw
     draw_Grid_Particles(particleList);
-
-    // simulate
-    simulate(particleList);
 
     // Render
     Render(window);

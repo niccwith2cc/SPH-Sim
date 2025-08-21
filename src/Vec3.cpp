@@ -16,6 +16,7 @@ void Vec3::set(float _x, float _y, float _z)
   this-> z = _z;
 };
 
+// Vector on vector operations
 Vec3 Vec3::operator+(const Vec3& other) const { return Vec3(x + other.x, y + other.y, z + other.z); };
 Vec3 Vec3::operator-(const Vec3& other) const { return Vec3(x - other.x, y - other.y, z - other.z); };
 Vec3 Vec3::operator*(const Vec3& other) const { return Vec3(x * other.x, y * other.y, z * other.z); };
@@ -26,6 +27,7 @@ Vec3 Vec3::operator/(const Vec3& other) const {
   return Vec3(x / other.x, y / other.y, z / other.z); 
 };
 
+// Vector on self operations
 Vec3& Vec3::operator+=(const Vec3& other) { x += other.x, y += other.y, z += other.z; return *this; };
 Vec3& Vec3::operator-=(const Vec3& other) { x -= other.x, y -= other.y, z -= other.z; return *this; };
 Vec3& Vec3::operator*=(const Vec3& other) { x *= other.x, y *= other.y, z *= other.z; return *this; };
@@ -36,6 +38,18 @@ Vec3& Vec3::operator/=(const Vec3& other) {
   x /= other.x, y /= other.y, z /= other.z; 
   return *this; 
 };
+
+// Vector on scalar operations
+Vec3 Vec3::operator+(const float other) const { return Vec3(x + other, y + other, z + other); };
+Vec3 Vec3::operator-(const float other) const { return Vec3(x - other, y - other, z - other); };
+Vec3 Vec3::operator*(const float other) const { return Vec3(x * other, y * other, z * other); };
+Vec3 Vec3::operator/(const float other) const { 
+  if (other == 0.0f) {
+    throw std::runtime_error("Division by zero in operator/");
+  }
+  return Vec3(x / other, y / other, z / other); 
+};
+
 
 void Vec3::Print() const {
   std::cout << "Vector " << " " << x << " " << y << " " << z << std::endl;
