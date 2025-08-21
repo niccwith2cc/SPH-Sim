@@ -1,4 +1,20 @@
 #include "Vec3.h"
 #include "Particle.h"
+#include <vector>
 
-void simulate(Particle &p);
+constexpr float g = 9.806f;
+
+void simulate(std::vector<Particle> &particleList){
+  for (auto & p : particleList){
+    gravity(p);
+
+  }
+}
+
+void gravity(Particle &p){
+  p.setAcc({0.0f, -g, 0.0f});
+}
+
+void timstep(Particle &p){
+ 
+}
