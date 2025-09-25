@@ -35,10 +35,11 @@ void draw_Grid_Particles(std::vector<Particle> &particleList){
   ImGui::NewFrame();
 
   ImGui::Begin("Particle Info:");
-  ImGui::Text("Position: (%.2f, %.2f, %.2f)", particleList[1].getPosition().getX(), particleList[1].getPosition().getY(), particleList[1].getPosition().getZ());
-  ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", particleList[1].getVelocity().getX(), particleList[1].getVelocity().getY(), particleList[1].getVelocity().getZ());
-  ImGui::Text("Mass: %.2f", particleList[1].getMass());
-  ImGui::Text("Pressure: %.2f", particleList[1].getPressure());
+  ImGui::Text("Position: (%.2f, %.2f, %.2f)", particleList[0].getPosition().getX(), particleList[0].getPosition().getY(), particleList[0].getPosition().getZ());
+  ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", particleList[0].getVelocity().getX(), particleList[0].getVelocity().getY(), particleList[0].getVelocity().getZ());
+  ImGui::Text("Acceleration: (%.2f, %.2f, %.2f)", particleList[0].getAcc().getX(), particleList[0].getAcc().getY(), particleList[0].getAcc().getZ());
+  ImGui::Text("Mass: %.2f", particleList[0].getMass());
+  ImGui::Text("Pressure: %.2f", particleList[0].getPressure());
   ImGui::End();
 
   // Main simulation window

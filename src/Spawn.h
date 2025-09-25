@@ -14,8 +14,8 @@ void spawnGrid(std::vector<Particle> &particleList, int nb){
   float dx = 1.0f;
   for (int i = 0; i < nb; i++){
     for (int j = 0; j < nb; j++){
-      Vec3 pos(j * dx, i * dx, 0.0f);
       Particle p;
+      Vec3 pos(j * dx, i * dx, 0.00f);
       p.setPosition(pos);
       particleList.push_back(p);
     }

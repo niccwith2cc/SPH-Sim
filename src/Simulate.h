@@ -7,9 +7,13 @@
 const Vec3 g(0.0f, -9.806f, 0.0f);
 
 float Dt(std::vector<Particle> &particleList){
-  float CFL = 0.5f;
+  // Velocity based adaptive dt
+  float CFL = 0.4f;
   float eps = 1e-6f;
-  float dx = 1.0f;
+  float dt_min = 1e-4f;
+  float dt_max = 0.01f;
+
+  float particleSpacing = 1.0f;
 
   float maxVel = eps;
   for (auto& p: particleList){
@@ -20,7 +24,11 @@ float Dt(std::vector<Particle> &particleList){
     if (velMag > maxVel) maxVel = velMag; 
   }
 
-  return CFL*dx / std::max(maxVel, eps);
+  if (maxVel < 1e-6f) return dt_max;
+
+  float dt_cfl =  CFL * particleSpacing / maxVel;
+  // std::cout << "dt_cfl " << dt_cfl << " vs dt_min " << dt_min << " vs dt_max " << dt_max << std::endl; 
+  return std::clamp(dt_cfl, dt_min, dt_max);
 }
 
 void gravity(Particle &p){
@@ -30,33 +38,36 @@ void gravity(Particle &p){
 void timestep(Particle &p, float dt){
   Vec3 pos = p.getPosition();
   Vec3 vel = p.getVelocity();
+  Vec3 acc = p.getAcc();
 
-  pos += vel * dt + g * dt * dt * 0.5f;
+  pos += vel * dt + acc * (dt * dt * 0.5f);
+  vel += acc * (0.5f * dt);
+
+  gravity(p);
+  Vec3 newacc = p.getAcc();
+
+  vel += newacc * (0.5f * dt);
+
   p.setPosition(pos);
-
-  vel += g * dt;
   p.setVelocity(vel);
+  p.setAcc(newacc);
+
 }
 
-void simulate(std::vector<Particle> &particleList, float finalTime){
-  float time = 0.0f;
-  float dt;
-  int timeSteps = 0;
-  
+void simulate(std::vector<Particle> &particleList, float &finalTime, float &time, float &dt, int &timeSteps){
   while (time < finalTime){
-    if (timeSteps < 2){
-      dt = 0.01f;
-      std::cout << "The current time step dt: " << dt << ", with time: "  << timeSteps << std::endl;
-    } else {
-      dt = Dt(particleList);
-    } 
+    dt = 0.01f;
+    std::cout << "The current time step dt: " << dt << ", with time: "  << time << std::endl; 
 
     timeSteps++;
     time += dt;
 
     for (auto & p : particleList){
-        gravity(p);
-        timestep(p, dt);
-      }
+      gravity(p);
+    }
+
+    for (auto & p : particleList){
+      timestep(p, dt);
+    }
   }
 }
