@@ -15,7 +15,7 @@ This is a passion project ideally for investigating SPH simulation techniques in
 
 The current list:
 
-- [ ] Have a running realtime simulation
+- [x] Have a running realtime simulation
 - [ ] Add several particles
 - [ ] Simulate water like effects
 - [ ] Complete a Full CFD simulation

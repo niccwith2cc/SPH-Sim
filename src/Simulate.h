@@ -120,7 +120,7 @@ void simulateStep(std::vector<Particle> &particleList, float &time, float &dt, i
 
   for (auto & p : particleList){
     timestep(p, dt);
-    applyBoxConstraint(p, boundary, 0.5f);
+    applyBoxConstraint(p, boundary);
   }
 
   if (status){

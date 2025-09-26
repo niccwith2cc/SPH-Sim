@@ -16,7 +16,7 @@ int main() {
 
   // initial conditions
   std::vector<Particle> particleList;
-  int nb = 1;
+  int nb = 5;
   float finalTime = 10.0f;
   float time = 0.0f;
   float dt = 0.0f;
