@@ -1,5 +1,6 @@
 #include "Particle.h"
 #include "Vec3.h"
+#include "Globals.h"
 #include "imgui.h"
 #include <vector>
 #include <GLFW/glfw3.h>
@@ -55,8 +56,8 @@ void drawGridParticles(std::vector<Particle> &particleList){
   
   // --- Simulation drawing area ---
   // Define grid parameters
-  float grid_spacing = 40.0f; // pixels between grid lines
-  int grid_lines = 10;        // number of lines in each direction from center
+  constexpr float grid_spacing = 40.0f; // pixels between grid lines
+  constexpr int grid_lines = 10;        // number of lines in each direction from center
 
   // Center of the simulation area in window coordinates
   ImVec2 sim_center = ImVec2(win_pos.x + win_size.x * 0.5f, win_pos.y + win_size.y * 0.5f);
@@ -86,6 +87,10 @@ void drawGridParticles(std::vector<Particle> &particleList){
   draw_list->AddLine(ImVec2(sim_center.x - grid_lines * grid_spacing, sim_center.y),
                       ImVec2(sim_center.x + grid_lines * grid_spacing, sim_center.y),
                       IM_COL32(150, 150, 150, 255), 2.0f);
+
+  draw_list->AddRect(ImVec2(sim_center.x + boundary.xmin * grid_spacing, sim_center.y - boundary.ymax * grid_spacing),
+                     ImVec2(sim_center.x + boundary.xmax * grid_spacing, sim_center.y - boundary.ymin * grid_spacing),                     
+                     IM_COL32(200, 50, 50, 255), 2.0f);
 
   // --- Draw the particle ---
   // Map particle's (x, y) to screen coordinates

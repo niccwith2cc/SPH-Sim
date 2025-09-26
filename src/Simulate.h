@@ -1,10 +1,29 @@
 #include "Vec3.h"
 #include "Particle.h"
+#include "Globals.h"
 #include <vector>
 #include <algorithm>
 #include <math.h>
 
-const Vec3 g(0.0f, -9.806f, 0.0f);
+void spawnGrid(std::vector<Particle> &particleList, int nb){
+  // to use this to create a nb * nb grid
+  /*
+    |
+    |
+    |
+  i |  nb |
+    |  0  |  1  |  2  | ... | nb - 1 | j
+  */
+  float dx = 1.0f;
+  for (int i = 0; i < nb; i++){
+    for (int j = 0; j < nb; j++){
+      Particle p;
+      Vec3 pos(j * dx, i * dx, 0.00f);
+      p.setPosition(pos);
+      particleList.push_back(p);
+    }
+  }
+}
 
 float Dt(std::vector<Particle> &particleList){
   // Velocity based adaptive dt
@@ -51,6 +70,41 @@ void timestep(Particle &p, float dt){
   p.setPosition(pos);
   p.setVelocity(vel);
   p.setAcc(newacc);
+}
+
+void applyBoxConstraint(Particle &p, const Box& boundary, float restitution = 1.0f){
+  Vec3 pos = p.getPosition();
+  Vec3 vel = p.getVelocity();
+
+  // check x axis
+  if (pos.getX() < boundary.xmin){
+    pos.set(boundary.xmin, pos.getY(), pos.getZ());
+    vel.set(-vel.getX() * restitution, vel.getY(), vel.getZ());
+  } else if (pos.getX() > boundary.xmax){
+    pos.set(boundary.xmax, pos.getY(), pos.getZ());
+    vel.set(-vel.getX() * restitution, vel.getY(), vel.getZ());
+  }
+
+  // check y axis
+  if (pos.getY() < boundary.ymin){
+    pos.set(pos.getX(), boundary.ymin, pos.getZ());
+    vel.set(vel.getX(), -vel.getY() * restitution, vel.getZ());
+  } else if (pos.getX() > boundary.ymax){
+    pos.set(pos.getX(), boundary.ymax, pos.getZ());
+    vel.set(vel.getX(), -vel.getY() * restitution, vel.getZ());
+  }
+
+  // check z axis
+  if (pos.getZ() < boundary.zmin){
+    pos.set(pos.getX(), pos.getY(), boundary.zmin);
+    vel.set(vel.getX(), vel.getY(), -vel.getZ() * restitution);
+  } else if (pos.getZ() > boundary.zmax){
+    pos.set(pos.getX(), pos.getY(), boundary.zmax);
+    vel.set(vel.getX(), vel.getY(), -vel.getZ() * restitution);
+  }
+
+  p.setPosition(pos);
+  p.setVelocity(vel);
 
 }
 
@@ -66,6 +120,7 @@ void simulateStep(std::vector<Particle> &particleList, float &time, float &dt, i
 
   for (auto & p : particleList){
     timestep(p, dt);
+    applyBoxConstraint(p, boundary, 0.5f);
   }
 
   if (status){

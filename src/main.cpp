@@ -1,7 +1,7 @@
 #include <Particle.h>
 #include <Vec3.h>
 #include <Simulate.h>
-#include <Spawn.h>
+#include <Globals.h>
 #include <Draw.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
@@ -16,8 +16,8 @@ int main() {
 
   // initial conditions
   std::vector<Particle> particleList;
-  int nb = 4;
-  float finalTime = 5.0f;
+  int nb = 1;
+  float finalTime = 10.0f;
   float time = 0.0f;
   float dt = 0.0f;
   int timeSteps = 0;
