@@ -25,26 +25,28 @@ int startWin(GLFWwindow* window){
   return 0;
 }
 
+void drawParticleInfo(const Particle& p){
+  ImGui::Begin("Particle Info:");
+  ImGui::Text("Position: (%.2f, %.2f, %.2f)", p.getPosition().getX(), p.getPosition().getY(), p.getPosition().getZ());
+  ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", p.getVelocity().getX(), p.getVelocity().getY(), p.getVelocity().getZ());
+  ImGui::Text("Acceleration: (%.2f, %.2f, %.2f)", p.getAcc().getX(), p.getAcc().getY(), p.getAcc().getZ());
+  ImGui::Text("Mass: %.2f", p.getMass());
+  ImGui::Text("Pressure: %.2f", p.getPressure());
+  ImGui::End();
+}
 
-void draw_Grid_Particles(std::vector<Particle> &particleList){
-
-  glfwPollEvents();
+void drawGridParticles(std::vector<Particle> &particleList){
 
   ImGui_ImplOpenGL3_NewFrame();
   ImGui_ImplGlfw_NewFrame();
   ImGui::NewFrame();
 
-  ImGui::Begin("Particle Info:");
-  ImGui::Text("Position: (%.2f, %.2f, %.2f)", particleList[0].getPosition().getX(), particleList[0].getPosition().getY(), particleList[0].getPosition().getZ());
-  ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", particleList[0].getVelocity().getX(), particleList[0].getVelocity().getY(), particleList[0].getVelocity().getZ());
-  ImGui::Text("Acceleration: (%.2f, %.2f, %.2f)", particleList[0].getAcc().getX(), particleList[0].getAcc().getY(), particleList[0].getAcc().getZ());
-  ImGui::Text("Mass: %.2f", particleList[0].getMass());
-  ImGui::Text("Pressure: %.2f", particleList[0].getPressure());
-  ImGui::End();
+  if (!particleList.empty())
+    drawParticleInfo(particleList[0]);
 
   // Main simulation window
   ImGui::SetNextWindowSize(ImVec2(1680, 1050), ImGuiCond_FirstUseEver);
-  ImGui::Begin("Yes");
+  ImGui::Begin("Simulation Window");
 
   // Get draw list and window geometry
   ImDrawList* draw_list = ImGui::GetWindowDrawList();
@@ -93,8 +95,6 @@ void draw_Grid_Particles(std::vector<Particle> &particleList){
     float radius = 5.0f * p.getMass();
     draw_list->AddCircleFilled(ImVec2(px, py), radius, IM_COL32(100, 200, 255, 255));   
   }
-
-  //simulate
 
   ImGui::End();
 }

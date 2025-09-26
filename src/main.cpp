@@ -10,15 +10,19 @@
 #include <string>
 #include <vector>
 
+#define DEBUG 1
+
 int main() {
 
   // initial conditions
   std::vector<Particle> particleList;
   int nb = 4;
-  float finalTime = 1.0f;
+  float finalTime = 5.0f;
   float time = 0.0f;
   float dt = 0.0f;
   int timeSteps = 0;
+
+  bool status = DEBUG;
 
   spawnGrid(particleList, nb);
 
@@ -28,11 +32,16 @@ int main() {
   if (fail == -1) return -1;
 
   while (!glfwWindowShouldClose(window)) {
+
+    glfwPollEvents(); // better to keep poll events in the main loop
+
     // Draw
-    draw_Grid_Particles(particleList);
+    drawGridParticles(particleList);
 
     // simulate
-    simulate(particleList, finalTime, time, dt, timeSteps);
+    if (time < finalTime){
+      simulateStep(particleList, time, dt, timeSteps, status);
+    }
 
     // Render
     Render(window);

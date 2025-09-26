@@ -54,20 +54,21 @@ void timestep(Particle &p, float dt){
 
 }
 
-void simulate(std::vector<Particle> &particleList, float &finalTime, float &time, float &dt, int &timeSteps){
-  while (time < finalTime){
-    dt = 0.01f;
+void simulateStep(std::vector<Particle> &particleList, float &time, float &dt, int &timeSteps, bool &status){
+  dt = Dt(particleList);
+
+  timeSteps++;
+  time += dt;
+
+  for (auto & p : particleList){
+    gravity(p);
+  }
+
+  for (auto & p : particleList){
+    timestep(p, dt);
+  }
+
+  if (status){
     std::cout << "The current time step dt: " << dt << ", with time: "  << time << std::endl; 
-
-    timeSteps++;
-    time += dt;
-
-    for (auto & p : particleList){
-      gravity(p);
-    }
-
-    for (auto & p : particleList){
-      timestep(p, dt);
-    }
   }
 }

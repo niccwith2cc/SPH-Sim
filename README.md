@@ -3,6 +3,7 @@
 ## Description
 
 This is a passion project ideally for investigating SPH simulation techniques including
+
 - CFD simulations
 - Realistic graphics
 - Real time rendering
