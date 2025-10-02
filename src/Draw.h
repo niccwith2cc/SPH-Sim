@@ -57,7 +57,7 @@ void drawGridParticles(std::vector<Particle> &particleList){
   // --- Simulation drawing area ---
   // Define grid parameters
   constexpr float grid_spacing = 40.0f; // pixels between grid lines
-  constexpr int grid_lines = 10;        // number of lines in each direction from center
+  constexpr int grid_lines = 50;        // number of lines in each direction from center
 
   // Center of the simulation area in window coordinates
   ImVec2 sim_center = ImVec2(win_pos.x + win_size.x * 0.5f, win_pos.y + win_size.y * 0.5f);

@@ -37,6 +37,7 @@ public:
   Vec3 operator/(const float other) const;
 
   void Print() const;
+  float length() const;
   friend std::ostream& operator<<(std::ostream& os, const Vec3& v);
 
 };

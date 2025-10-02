@@ -5,24 +5,18 @@
 #include <algorithm>
 #include <math.h>
 
-void spawnGrid(std::vector<Particle> &particleList, int nb){
-  // to use this to create a nb * nb grid
-  /*
-    |
-    |
-    |
-  i |  nb |
-    |  0  |  1  |  2  | ... | nb - 1 | j
-  */
-  float dx = 1.0f;
-  for (int i = 0; i < nb; i++){
-    for (int j = 0; j < nb; j++){
-      Particle p;
-      Vec3 pos(j * dx, i * dx, 0.00f);
-      p.setPosition(pos);
-      particleList.push_back(p);
-    }
-  }
+void spawnParticles(std::vector<Particle> &particleList, int nb){
+  constexpr float massSun = 5.0f;
+  constexpr float massPlanet = 2.0f;
+
+  const Vec3 posSun = {0.0f, 0.0f, 0.0f};
+  const Vec3 posPlanet = {2.0f, 5.0f, 0.0f};
+  const Vec3 fill = {0.0f, 0.0f, 0.0f};
+
+  Particle sun(posSun, fill, fill, fill, massSun, 0.0f);
+  particleList.push_back(sun);
+  Particle planet(posPlanet, fill, fill, fill, massPlanet, 0.0f);
+  particleList.push_back(planet);
 }
 
 float Dt(std::vector<Particle> &particleList){
@@ -50,26 +44,72 @@ float Dt(std::vector<Particle> &particleList){
   return std::clamp(dt_cfl, dt_min, dt_max);
 }
 
-void gravity(Particle &p){
-  p.setAcc(g);
+void Acc(Particle &p){
+  Vec3 F = p.getForce();
+  float m = p.getMass();
+  Vec3 Acc = F / m;
+  std::cout << "Acc is " << Acc << std::endl;
+  p.setAcc(Acc);
+} 
+
+void Force(std::vector<Particle>& particleList){
+  Particle& p1 = particleList[0];
+  Particle& p2 = particleList[1];
+
+  Vec3 r = p1.getPosition() - p2.getPosition();
+  float dist = r.length();
+  
+  const float eps = 1e-8;
+  
+  Vec3 F = r * ( (-G * p1.getMass() * p2.getMass()) / (dist * dist * dist) );
+  // Vec3 F = {0.0f, 0.0f, 0.0f};
+
+  // if (invR.getX() < eps || invR.getY() < eps || invR.getZ() < eps){  
+  //   F = invR * -G * p1.getMass() * p2.getMass();
+  // } else {
+  //   F = invR * -G * p1.getMass() * p2.getMass() * 1e-8f;
+  // }
+
+  p1.setForce(F);
+  // if (DEBUG){
+  //   std::cout << "Set force on Sun to be: " << F  << " N." << std::endl;
+  // }
+  p2.setForce(F*-1.0f);
+  // if (DEBUG){
+  //   std::cout << "Set force on Planet to be: " << F*-1  << " N." << std::endl;
+  // }
+  
+  for (auto& p : particleList){
+    Acc(p);
+  }
 }
 
-void timestep(Particle &p, float dt){
-  Vec3 pos = p.getPosition();
-  Vec3 vel = p.getVelocity();
-  Vec3 acc = p.getAcc();
 
-  pos += vel * dt + acc * (dt * dt * 0.5f);
-  vel += acc * (0.5f * dt);
+void timestep(std::vector<Particle>& particleList, float dt){
+  
+  for (auto& p : particleList) {
+    Vec3 pos = p.getPosition();
+    Vec3 vel = p.getVelocity();
+    Vec3 acc = p.getAcc();
 
-  gravity(p);
-  Vec3 newacc = p.getAcc();
+    pos += vel * dt + acc * (0.5f * dt * dt);
+    vel += acc * (0.5f * dt);
 
-  vel += newacc * (0.5f * dt);
+    p.setPosition(pos);
+    p.setVelocity(vel);
+  }
 
-  p.setPosition(pos);
-  p.setVelocity(vel);
-  p.setAcc(newacc);
+  Force(particleList);
+
+  for (auto& p : particleList) {
+    Vec3 vel = p.getVelocity();
+    Vec3 acc = p.getAcc();
+
+    vel += acc * (0.5f * dt);
+
+    p.setVelocity(vel);
+  }
+
 }
 
 void applyBoxConstraint(Particle &p, const Box& boundary, float restitution = 1.0f){
@@ -89,7 +129,7 @@ void applyBoxConstraint(Particle &p, const Box& boundary, float restitution = 1.
   if (pos.getY() < boundary.ymin){
     pos.set(pos.getX(), boundary.ymin, pos.getZ());
     vel.set(vel.getX(), -vel.getY() * restitution, vel.getZ());
-  } else if (pos.getX() > boundary.ymax){
+  } else if (pos.getY() > boundary.ymax){
     pos.set(pos.getX(), boundary.ymax, pos.getZ());
     vel.set(vel.getX(), -vel.getY() * restitution, vel.getZ());
   }
@@ -114,12 +154,11 @@ void simulateStep(std::vector<Particle> &particleList, float &time, float &dt, i
   timeSteps++;
   time += dt;
 
-  for (auto & p : particleList){
-    gravity(p);
-  }
+  Force(particleList);
 
-  for (auto & p : particleList){
-    timestep(p, dt);
+  timestep(particleList, dt);
+
+  for (auto& p : particleList){
     applyBoxConstraint(p, boundary);
   }
 

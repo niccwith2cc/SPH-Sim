@@ -10,13 +10,12 @@
 #include <string>
 #include <vector>
 
-#define DEBUG 1
 
 int main() {
 
   // initial conditions
   std::vector<Particle> particleList;
-  int nb = 5;
+  int nb = 2;
   float finalTime = 10.0f;
   float time = 0.0f;
   float dt = 0.0f;
@@ -24,7 +23,7 @@ int main() {
 
   bool status = DEBUG;
 
-  spawnGrid(particleList, nb);
+  spawnParticles(particleList, nb);
 
   if (!glfwInit()) return -1;
   GLFWwindow* window = glfwCreateWindow(1920, 1200, "Windowed View", NULL, NULL);

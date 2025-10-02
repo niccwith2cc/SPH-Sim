@@ -16,6 +16,8 @@ This is a passion project ideally for investigating SPH simulation techniques in
 The current list:
 
 - [x] Have a running realtime simulation
-- [ ] Add several particles
-- [ ] Simulate water like effects
-- [ ] Complete a Full CFD simulation
+- [ ] Fix ```simulateStep``` function
+- [ ] Fix inconsistency in programming design
+- [ ] Clean up ```Force``` function
+- [ ] Fix size of Sun and Planet
+- [ ] Fix position of Sun and let planet rotate.

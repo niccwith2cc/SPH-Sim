@@ -1,5 +1,6 @@
 #include "Vec3.h"
 #include <iostream>
+#include <cmath>
 
 Vec3::Vec3() : x(0.0f), y(0.0f), z(0.0f) {}
 Vec3::Vec3(float _x, float _y, float _z): x(_x), y(_y), z(_z) {}
@@ -54,6 +55,10 @@ Vec3 Vec3::operator/(const float other) const {
 void Vec3::Print() const {
   std::cout << "Vector " << " " << x << " " << y << " " << z << std::endl;
 };
+
+float Vec3::length() const {
+  return std::sqrt(x*x + y*y + z*z);
+}
 
 std::ostream& operator<<(std::ostream& os, const Vec3& v){
   os << "Vec3( " << v.x << ", " << v.y << ", " << v.z << " )";
