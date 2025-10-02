@@ -6,16 +6,23 @@
 #include <math.h>
 
 void spawnParticles(std::vector<Particle> &particleList, int nb){
-  constexpr float massSun = 5.0f;
-  constexpr float massPlanet = 2.0f;
+  constexpr float massSun = M_Sun;
+  constexpr float massPlanet = M_Planet;
 
   const Vec3 posSun = {0.0f, 0.0f, 0.0f};
-  const Vec3 posPlanet = {2.0f, 5.0f, 0.0f};
+  const Vec3 posPlanet = {50.0f, 0.0f, 0.0f};
   const Vec3 fill = {0.0f, 0.0f, 0.0f};
+
+  Vec3 r = posSun - posPlanet;
+  float dist = r.length();
+  float vel = std::sqrt(G * M_Sun / dist);
+  const Vec3 initial_vel = {0.0f, vel, 0.0f};
 
   Particle sun(posSun, fill, fill, fill, massSun, 0.0f);
   particleList.push_back(sun);
+
   Particle planet(posPlanet, fill, fill, fill, massPlanet, 0.0f);
+  planet.setVelocity(initial_vel);
   particleList.push_back(planet);
 }
 
@@ -53,64 +60,24 @@ void Acc(Particle &p){
 } 
 
 void Force(std::vector<Particle>& particleList){
-  Particle& p1 = particleList[0];
-  Particle& p2 = particleList[1];
+  Particle& sun = particleList[0];
+  Particle& planet = particleList[1];
 
-  Vec3 r = p1.getPosition() - p2.getPosition();
-  float dist = r.length();
+  Vec3 r = planet.getPosition() - sun.getPosition(); // planet to sun
+  float dist2 = r.getX()*r.getX() + r.getY()*r.getY() + r.getZ()*r.getZ();
+  const float softening = 1e-6f; // TODO: tune this variable
+  float invDist = 1.0f / std::sqrt(dist2 + softening*softening);
+  float invDist3 = invDist * invDist * invDist;
   
-  const float eps = 1e-8;
-  
-  Vec3 F = r * ( (-G * p1.getMass() * p2.getMass()) / (dist * dist * dist) );
-  // Vec3 F = {0.0f, 0.0f, 0.0f};
+  Vec3 F = r * ( -G * sun.getMass() * planet.getMass() * invDist3 );
 
-  // if (invR.getX() < eps || invR.getY() < eps || invR.getZ() < eps){  
-  //   F = invR * -G * p1.getMass() * p2.getMass();
-  // } else {
-  //   F = invR * -G * p1.getMass() * p2.getMass() * 1e-8f;
-  // }
-
-  p1.setForce(F);
-  // if (DEBUG){
-  //   std::cout << "Set force on Sun to be: " << F  << " N." << std::endl;
-  // }
-  p2.setForce(F*-1.0f);
-  // if (DEBUG){
-  //   std::cout << "Set force on Planet to be: " << F*-1  << " N." << std::endl;
-  // }
+  sun.setForce(F* -1.0f);
+  planet.setForce(F);
   
-  for (auto& p : particleList){
-    Acc(p);
-  }
+  Acc(sun);
+  Acc(planet);
 }
 
-
-void timestep(std::vector<Particle>& particleList, float dt){
-  
-  for (auto& p : particleList) {
-    Vec3 pos = p.getPosition();
-    Vec3 vel = p.getVelocity();
-    Vec3 acc = p.getAcc();
-
-    pos += vel * dt + acc * (0.5f * dt * dt);
-    vel += acc * (0.5f * dt);
-
-    p.setPosition(pos);
-    p.setVelocity(vel);
-  }
-
-  Force(particleList);
-
-  for (auto& p : particleList) {
-    Vec3 vel = p.getVelocity();
-    Vec3 acc = p.getAcc();
-
-    vel += acc * (0.5f * dt);
-
-    p.setVelocity(vel);
-  }
-
-}
 
 void applyBoxConstraint(Particle &p, const Box& boundary, float restitution = 1.0f){
   Vec3 pos = p.getPosition();
@@ -145,24 +112,46 @@ void applyBoxConstraint(Particle &p, const Box& boundary, float restitution = 1.
 
   p.setPosition(pos);
   p.setVelocity(vel);
-
 }
 
-void simulateStep(std::vector<Particle> &particleList, float &time, float &dt, int &timeSteps, bool &status){
+void simulateStep(std::vector<Particle> &particleList, float &time, float &dt, int &timeSteps){
   dt = Dt(particleList);
-
   timeSteps++;
   time += dt;
 
   Force(particleList);
 
-  timestep(particleList, dt);
+  for (auto& p : particleList) {
+    Vec3 vel = p.getVelocity();
+    Vec3 acc = p.getAcc();
+
+    vel += acc * (0.5f * dt);
+    p.setVelocity(vel);
+  }
+
+  for (auto& p : particleList){
+    Vec3 pos = p.getPosition() ;
+    Vec3 vel = p.getVelocity() ;
+    
+    pos += vel * dt;
+    p.setPosition(pos);
+  }
+
+  Force(particleList);
+
+  for (auto& p : particleList) {
+    Vec3 vel = p.getVelocity();
+    Vec3 acc = p.getAcc();
+    
+    vel += acc * (0.5f * dt);
+    p.setVelocity(vel);
+  }
 
   for (auto& p : particleList){
     applyBoxConstraint(p, boundary);
   }
 
-  if (status){
+  if (DEBUG){
     std::cout << "The current time step dt: " << dt << ", with time: "  << time << std::endl; 
   }
 }

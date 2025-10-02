@@ -28,5 +28,8 @@ public:
   void setForce(const Vec3& f); 
   void setMass(float m); 
   void setPressure(float p); 
+  // Utility: zero and accumulate forces
+  void zeroForce();
+  void addForce(const Vec3& f);
 };
 #endif //PARTICLE_H

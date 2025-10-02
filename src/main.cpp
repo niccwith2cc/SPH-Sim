@@ -16,17 +16,15 @@ int main() {
   // initial conditions
   std::vector<Particle> particleList;
   int nb = 2;
-  float finalTime = 10.0f;
+  float finalTime = 100.0f;
   float time = 0.0f;
   float dt = 0.0f;
   int timeSteps = 0;
 
-  bool status = DEBUG;
-
   spawnParticles(particleList, nb);
 
   if (!glfwInit()) return -1;
-  GLFWwindow* window = glfwCreateWindow(1920, 1200, "Windowed View", NULL, NULL);
+  GLFWwindow* window = glfwCreateWindow(2560, 1600, "Windowed View", NULL, NULL);
   int fail = startWin(window);
   if (fail == -1) return -1;
 
@@ -39,7 +37,7 @@ int main() {
 
     // simulate
     if (time < finalTime){
-      simulateStep(particleList, time, dt, timeSteps, status);
+      simulateStep(particleList, time, dt, timeSteps);
     }
 
     // Render

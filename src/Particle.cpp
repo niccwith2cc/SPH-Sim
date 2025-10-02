@@ -24,3 +24,7 @@ void Particle::setAcc(const Vec3& a) { acc = a ; };
 void Particle::setForce(const Vec3& f) { force = f ; }; 
 void Particle::setMass(float m) { mass = m ; }; 
 void Particle::setPressure(float p) { pressure = p ; };
+
+// Utilities
+void Particle::zeroForce(){ force = Vec3(0.0f, 0.0f, 0.0f); }
+void Particle::addForce(const Vec3& f){ force = force + f; }

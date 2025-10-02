@@ -26,13 +26,17 @@ int startWin(GLFWwindow* window){
   return 0;
 }
 
-void drawParticleInfo(const Particle& p){
-  ImGui::Begin("Particle Info:");
-  ImGui::Text("Position: (%.2f, %.2f, %.2f)", p.getPosition().getX(), p.getPosition().getY(), p.getPosition().getZ());
-  ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", p.getVelocity().getX(), p.getVelocity().getY(), p.getVelocity().getZ());
-  ImGui::Text("Acceleration: (%.2f, %.2f, %.2f)", p.getAcc().getX(), p.getAcc().getY(), p.getAcc().getZ());
-  ImGui::Text("Mass: %.2f", p.getMass());
-  ImGui::Text("Pressure: %.2f", p.getPressure());
+void drawParticleInfo(const std::vector<Particle>& particleList){
+  ImGui::Begin("Particle Info: ");
+  
+  for (auto & p : particleList){
+    ImGui::Text("Position: (%.2f, %.2f, %.2f)", p.getPosition().getX(), p.getPosition().getY(), p.getPosition().getZ());
+    ImGui::Text("Velocity: (%.2f, %.2f, %.2f)", p.getVelocity().getX(), p.getVelocity().getY(), p.getVelocity().getZ());
+    ImGui::Text("Acceleration: (%.2f, %.2f, %.2f)", p.getAcc().getX(), p.getAcc().getY(), p.getAcc().getZ());
+    ImGui::Text("Mass: %.2f", p.getMass());
+    ImGui::Text("Pressure: %.2f", p.getPressure());
+    ImGui::Text(" ");
+  }
   ImGui::End();
 }
 
@@ -43,10 +47,10 @@ void drawGridParticles(std::vector<Particle> &particleList){
   ImGui::NewFrame();
 
   if (!particleList.empty())
-    drawParticleInfo(particleList[0]);
+    drawParticleInfo(particleList);
 
   // Main simulation window
-  ImGui::SetNextWindowSize(ImVec2(1680, 1050), ImGuiCond_FirstUseEver);
+  ImGui::SetNextWindowSize(ImVec2(2560, 1600), ImGuiCond_FirstUseEver);
   ImGui::Begin("Simulation Window");
 
   // Get draw list and window geometry
@@ -56,7 +60,7 @@ void drawGridParticles(std::vector<Particle> &particleList){
   
   // --- Simulation drawing area ---
   // Define grid parameters
-  constexpr float grid_spacing = 40.0f; // pixels between grid lines
+  constexpr float grid_spacing = 20.0f; // pixels between grid lines
   constexpr int grid_lines = 50;        // number of lines in each direction from center
 
   // Center of the simulation area in window coordinates
@@ -97,7 +101,9 @@ void drawGridParticles(std::vector<Particle> &particleList){
   for (auto & p : particleList){
     float px = sim_center.x + p.getPosition().getX() * grid_spacing;
     float py = sim_center.y - p.getPosition().getY() * grid_spacing; // y axis up
-    float radius = 5.0f * p.getMass();
+    float const baseRad = 5.0f;
+    float const scale = 3.0f;
+    float radius = baseRad + scale * std::log10(p.getMass());
     draw_list->AddCircleFilled(ImVec2(px, py), radius, IM_COL32(100, 200, 255, 255));   
   }
 
